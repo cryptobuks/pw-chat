@@ -6,6 +6,9 @@ import feathersClient from '@/api/feathers-client'
 import conversationsModule from './modules/Conversations'
 import contactsActions from './modules/Contacts/actions'
 
+import ProfileUpdateActions from './modules/ProfileUpdateActions'
+import ProfileUpdateMutations from './modules/ProfileUpdateMutations'
+
 // Peers
 import peers from './modules/Peers'
 
@@ -24,7 +27,9 @@ const store = new Vuex.Store({
       actions: contactsActions
     }),
     auth({
-      userService: 'users'
+      userService: 'users',
+      mutations: ProfileUpdateMutations,
+      actions: ProfileUpdateActions
     })
   ],
   strict: process.env.NODE_ENV !== 'production'

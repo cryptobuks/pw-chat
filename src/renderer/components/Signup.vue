@@ -160,7 +160,6 @@ export default {
   },
   methods: {
     submit () {
-      console.log('Signup')
       this.$validator.validateAll()
 
       if ((this.errors.all()).length !== 0) {
@@ -168,11 +167,9 @@ export default {
         console.log('Errors', this.errors.all())
         return false
       }
-      console.log('signing up...')
       this.loading = true
       userService.create(this.form)
         .then(res => {
-          console.info('Signup success', res)
           this.loading = false
           this.success = true
           this.message = 'You have signed up successfuly. Please check your email inbox for email verification.'

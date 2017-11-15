@@ -1,18 +1,15 @@
 <template>
-	<v-layout row wrap align-center justify-center>
-    <v-flex xs6 md5 align-center justify-center text-xs-center>
-      <v-card>
+	<v-layout row wrap justify-center>
+    <v-flex xs10 md5 align-center justify-center text-xs-center>
+      <v-toolbar color="white">
+        <v-toolbar-title v-text="`${user.firstName} ${user.lastName}`"></v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon class="mr-3" router :to="{name: 'EditProfile'}">
+          <v-icon>edit</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-card class="mt-2">
         <v-card-media :src="user.profilePicture" height="200px">
-          <v-layout column class="media">
-            <v-card-title color="primary">
-              <div class="display-1 white--text" v-text="`${user.firstName} ${user.lastName}`"></div>
-              <v-spacer></v-spacer>
-              <v-btn dark icon class="mr-3" @click.native.stop="edit = !edit">
-                <v-icon v-if="edit === true">close</v-icon>
-                <v-icon v-else>edit</v-icon>
-              </v-btn>
-            </v-card-title>
-          </v-layout>
         </v-card-media>
         <v-list two-line>
           <v-list-tile>
@@ -44,11 +41,7 @@
 import { mapState } from 'vuex'
 
 export default {
-
   name: 'ProfileView',
-  data: () => ({
-    edit: false
-  }),
   computed: {
     ...mapState('auth', {
       user: state => state.user

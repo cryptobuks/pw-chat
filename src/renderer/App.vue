@@ -312,6 +312,7 @@ export default {
       } else {
         if (this.user && this.user.isVerified) {
           feathersClient.set('user', this.user)
+
           let peer
           const userPeerId = this.user.peerId
 

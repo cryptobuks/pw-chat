@@ -43,6 +43,12 @@ const router = new Router({
       meta: { requiresAuth: true }
     },
     {
+      name: 'EditProfile',
+      path: '/edit-profile',
+      component: require('@/components/ProfileView/EditProfile'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/contacts',
       name: 'contacts',
       component: require('@/components/Contacts'),
