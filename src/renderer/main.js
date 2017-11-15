@@ -3,12 +3,12 @@ import Vuetify from 'vuetify'
 import VeeValidate from 'vee-validate'
 import VueChatScroll from 'vue-chat-scroll'
 
-// WebRTC Adapter (adapter.js) A WebRTC sheem
-require('webrtc-adapter')
-
 import App from './App'
 import router from './router'
 import store from './store'
+
+// WebRTC Adapter (adapter.js) A WebRTC sheem
+require('webrtc-adapter')
 
 Vue.use(Vuetify)
 Vue.use(VeeValidate)

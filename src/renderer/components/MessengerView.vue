@@ -77,30 +77,35 @@
         max-width="750"
         >
       <v-card>
-        <v-card-title class="headline">{{ contact.fullName }}</v-card-title>
         <v-container grid-list-xl>
             <v-layout>
-              <v-flex sm12 md8 class="text-xs-center">
-                <video
-                  class="video remote-video"
-                  ref="remoteStream"
-                  autoplay
-                ></video>
-              </v-flex>
-              <v-flex sm12 md4 class="text-xs-center">
-                <video
-                  class="video my-video"
-                  ref="myStream"
-                  muted="true"
-                  autoplay
-                ></video>
+              <v-flex class="video-call">
+                <div class="contact-name">
+                  <h3>{{ contact.fullName }}</h3>
+                </div>
+                <div class="remote-stream">
+                  <video
+                    ref="remoteStream"
+                    autoplay
+                  >
+                  </video>
+                </div>
+                <div class="local-stream">
+                  <video
+                    ref="myStream"
+                    muted="true"
+                    autoplay
+                  >
+                  </video>
+                </div>
+                <div class="controls">
+                  <v-btn fab large dark color="red" @click.native.stop="endCall()">
+                    <v-icon>call_end</v-icon>
+                  </v-btn>
+                </div>
               </v-flex>
             </v-layout>
           </v-container>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" flat @click.native="endCall()">End Call</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-layout>
@@ -155,6 +160,10 @@ export default {
         this.peer = window.peer
       } else {
         this.peer = getPeer(peerId)
+      }
+
+      if (this.contact && this.contact.fullName) {
+        this.peerDataConn = this.connectToContactPeer(this.contact.peerId)
       }
     }
   },
@@ -220,6 +229,7 @@ export default {
       }
     },
     async endCall () {
+      this.$store.dispatch('conversations/clearOnCall')
       // close the call
       this.call.close()
 
@@ -229,8 +239,8 @@ export default {
           console.log('Call was either rejected or an error occurred!')
           return
         }
-        // const result = await this.saveCallToServer(this.callStart, callEnd)
-        console.log('Call saved successfully!', callEnd)
+        const result = await this.saveCallToServer(this.callStart, callEnd)
+        console.log('Call saved successfully!', callEnd, result)
         // TODO: send this call details to user
       } catch (err) {
         console.log('Call not saved!', err)
@@ -242,6 +252,10 @@ export default {
             track.stop()
           })
         }
+        this.$refs.myStream.srcObject = null
+        this.$refs.remoteStream.srcObject = null
+        this.localStream = null
+        this.remoteStream = null
         this.callDialog = false
       }
     },
@@ -257,7 +271,6 @@ export default {
         const result = await this.$store.dispatch('conversations/sendMessage', message)
         console.log('message send', result)
         // TODO: send this call details to user
-
         return result
       } catch (error) {
         console.log('Message not sent!', error)
@@ -265,14 +278,17 @@ export default {
       }
     },
     async callPartner () {
-      console.log('calling', this.contact.fullName)
+      console.log('calling - ', this.contact.fullName)
       // tell the store we are on call now
       this.$store.dispatch('conversations/onCallNow')
       const localStream = await getLocalStream()
       this.localStream = localStream
       this.callDialog = true
       // show our stream on dialog
-      this.$refs.myStream.src = URL.createObjectURL(localStream)
+      this.$refs.myStream.srcObject = localStream
+      this.$refs.myStream.onloadedmetadata = e => {
+        this.$refs.myStream.play()
+      }
       const call = this.peer.call(this.contact.peerId, localStream)
       this.call = call
       let callAccepted = false
@@ -282,7 +298,7 @@ export default {
           console.log('Call not answered in 5 seconds. closing now')
           this.endCall()
         }
-      }, 5000)
+      }, 10000) // change it to 5000
       // call connected
       this.call.on('stream', _remoteStream => {
         if (!callAccepted) {
@@ -290,26 +306,34 @@ export default {
           this.callStart = new Date()
           console.log('partner accepted')
         }
-        this.$refs.remoteStream.src = URL.createObjectURL(_remoteStream)
+        this.$refs.remoteStream.srcObject = _remoteStream
+        this.$refs.remoteStream.onloadedmetadata = e => {
+          this.$refs.remoteStream.play()
+        }
       })
       // call ended/closed by remote user
       this.call.on('close', async () => {
-        this.$refs.myStream.src = ''
-        this.$refs.remoteStream.src = ''
+        this.$store.dispatch('conversations/clearOnCall')
+        this.$refs.myStream.srcObject = null
+        this.$refs.remoteStream.srcObject = null
         // if call was rejected by them
         if (this.callStart === null) {
           console.log('Call was rejected by them')
           this.callDialog = false
+          this.endCall()
           return
         }
         // close the localStream (audio, video)
-        localStream.getTracks().forEach(track => track.stop())
+        if (this.localStream && this.localStream.getTracks) {
+          this.localStream.getTracks().forEach(track => track.stop())
+        }
         // save call to server
         try {
           const callEnd = new Date()
-          // const result = await this.saveCallToServer(this.callStart, callEnd)
-          // console.log('Call saved successfully!', result)
+          const result = await this.saveCallToServer(this.callStart, callEnd)
+          console.log('Call saved successfully!', result)
           // TODO: send this call details to user
+          this.peerDataConn.send(result)
           console.log('Call successfully ended')
           console.log(`Call detailes: started at: ${this.callStart}, ended at: ${callEnd}`)
         } catch (err) {
@@ -325,17 +349,19 @@ export default {
       this.peerDataConn = this.connectToContactPeer(peerId)
     },
     bindDataConnEvents (peerDataConn) {
-      // Tell me when the connection opens
-      peerDataConn.on('open', () => {
-        this.isContactOnline = true
-        console.log('Connected', peerDataConn.open)
-      })
+      if (peerDataConn) {
+        // Tell me when the connection opens
+        peerDataConn.on('open', () => {
+          this.isContactOnline = true
+          console.log('Connected', peerDataConn.open)
+        })
 
-      // listen to errors on the data connection
-      peerDataConn.on('error', err => {
-        console.log('Peer connection error', err)
-        console.log('Is peer data connection is open? ', peerDataConn.open)
-      })
+        // listen to errors on the data connection
+        peerDataConn.on('error', err => {
+          console.log('Peer connection error', err)
+          console.log('Is peer data connection is open? ', peerDataConn.open)
+        })
+      }
     },
     connectToContactPeer (peerId) {
       if (this.peer.disconnected === true && !this.peer.destroyed) {
@@ -344,6 +370,7 @@ export default {
       let peerDataConn = this.getPeerDataConnection(peerId)
       if (peerDataConn === null || peerDataConn.open === false) {
         peerDataConn = this.peer.connect(peerId)
+        console.log('Created new connection', peerDataConn)
         this.$store.dispatch('peers/addPeer', peerDataConn)
         this.bindDataConnEvents(peerDataConn)
       }
@@ -361,8 +388,7 @@ export default {
 .chat--container {
   height: 600px!important;
 }
-/*.chat--messages-list {
-}*/
+
 .chat--message-composer {
   bottom: 0;
 }

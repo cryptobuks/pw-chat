@@ -46,8 +46,8 @@
               </v-list-tile-action>
             </v-list-tile>
             <v-divider
-            v-if="i + 1 < conversations.length"
-            :key="conversation.id">
+              v-if="i + 1 < conversations.length"
+              :key="conversation.id">
             </v-divider>
           </template>
         </v-list>
@@ -113,38 +113,49 @@
         <v-card-title class="headline"> {{ callerName }} is calling you</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" @click.native="acceptCall()">Accept</v-btn>
-          <v-btn color="red darken-1"  @click.native="endCall()">Cancel</v-btn>
+          <v-btn color="green darken-1" @click.native="acceptCall()"> Accept
+            <v-icon dark right>check_circle</v-icon>
+          </v-btn>
+          <v-btn color="red darken-1"  @click.native="endCall()"> Cancel
+            <v-icon dark right>block</v-icon>
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="callDialog" persistent fullscreen
-        max-width="750">
+    <v-dialog
+      v-model="callDialog"
+      persistent
+      max-width="750">
       <v-card>
-        <v-card-title class="headline">{{ callerName }}</v-card-title>
         <v-container grid-list-xl>
             <v-layout>
-              <v-flex class="text-xs-center">
-                <video
-                  class="video remote-video"
-                  ref="remoteStream"
-                  autoplay
-                ></video>
-              </v-flex>
-              <v-flex class="text-xs-center">
-                <video
-                  class="video my-video"
-                  ref="myStream"
-                  muted="true"
-                  autoplay
-                ></video>
+              <v-flex class="text-xs-center video-call">
+                <div class="contact-name">
+                  <h3>{{ callerName }}</h3>
+                </div>
+                <div class="remote-stream">
+                  <video
+                    ref="remoteStream"
+                    autoplay
+                  >
+                  </video>
+                </div>
+                <div class="local-stream">
+                  <video
+                    ref="myStream"
+                    muted="true"
+                    autoplay
+                  >
+                  </video>
+                </div>
+                <div class="controls">
+                  <v-btn fab dark color="red darken-1" @click.native.stop="endCall()">
+                    <v-icon lg>call_end</v-icon>
+                  </v-btn>
+                </div>
               </v-flex>
             </v-layout>
           </v-container>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" flat @click.native="endCall()">End Call</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
     <v-navigation-drawer
@@ -469,14 +480,18 @@ export default {
             time: new Date()
           })
         }
-      }, 5000)
+      }, 10000) // change it to 5000
     },
 
     async acceptCall () {
       // hide the call prompt
       this.callPrompt = false
       const localStream = await getLocalStream()
-      this.$refs.myStream.src = URL.createObjectURL(localStream)
+      this.localStream = localStream
+      this.$refs.myStream.srcObject = localStream
+      this.$refs.myStream.onloadedmetadata = e => {
+        this.$refs.myStream.play()
+      }
       // show  the video call interface model
       this.callDialog = true
       this.call.answer(localStream)
@@ -485,18 +500,23 @@ export default {
       this.$store.dispatch('conversations/onCallNow')
       // call connected
       this.call.on('stream', _remoteStream => {
-        this.$refs.remoteStream.src = URL.createObjectURL(_remoteStream)
+        this.$refs.remoteStream.srcObject = _remoteStream
+        this.$refs.remoteStream.onloadedmetadata = e => {
+          this.$refs.remoteStream.play()
+        }
       })
       // call ended/closed by remote user
       this.call.on('close', () => {
         console.log('call ended')
         this.callDialog = false
         this.call = null
-        this.$refs.myStream.src = ''
-        this.$refs.remoteStream.src = ''
 
-        localStream.getTracks().forEach(track => track.stop())
-
+        this.$refs.myStream.srcObject = null
+        this.$refs.remoteStream.srcObject = null
+        if (this.localStream && this.localStream.getTracks) {
+          this.localStream.getTracks().forEach(track => track.stop())
+        }
+        this.localStream = null
         this.$store.dispatch('conversations/clearOnCall')
       })
     },
@@ -504,6 +524,12 @@ export default {
     endCall () {
       console.log('closing this.call', this.call)
       this.call.close()
+      this.$refs.myStream.srcObject = null
+      this.$refs.remoteStream.srcObject = null
+      if (this.localStream && this.localStream.getTracks) {
+        this.localStream.getTracks().forEach(track => track.stop())
+      }
+      this.localStream = null
       this.callPrompt = false
       this.callDialog = false
       this.call = null
@@ -546,22 +572,5 @@ export default {
   ::-webkit-scrollbar-thumb:active {
     background: linear-gradient(left, #22ADD4, #1E98BA);
   }
-  .video {
-    border: 0 none;
-    margin: 5px auto;
-  }
 
-  .video.my-video {
-    margin-top: 5px;
-    width: 150px;
-    height: auto;
-    background-color: #eee;
-  }
-
-  .video.remote-video {
-    width: 350px;
-    height: 300px;
-    max-height: 480px;
-    background-color: #eee;
-  }
 </style>

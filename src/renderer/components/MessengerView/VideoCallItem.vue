@@ -1,7 +1,14 @@
 <template>
   <li class="video-call-item">
-    <div class="call">
-      video call by {{ userName }}, at {{ callTime }}
+    <div class="text-xs-center">
+        <span class="call">
+          <v-icon>video_call</v-icon>
+          <v-icon v-if="isFromUser">call_made</v-icon>
+          <v-icon v-else>call_received</v-icon>
+          <small>
+            {{ callTime }}
+          </small>
+        </span>
     </div>
   </li>
 </template>
@@ -11,3 +18,9 @@ export default {
   props: ['call', 'userName', 'callTime', 'isFromUser']
 }
 </script>
+<style lang="stylus">
+.call
+  background #e1e4e8
+  padding 2px 15px
+  border-radius 2px 4px
+</style>
