@@ -481,7 +481,7 @@ export default {
             time: new Date()
           })
         }
-      }, 10000) // change it to 5000
+      }, 5000)
     },
 
     async acceptCall () {

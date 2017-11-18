@@ -8,6 +8,8 @@
           <small>
             {{ callTime }}
           </small>
+          |
+          <span>{{ callDuration }}</span>
         </span>
     </div>
   </li>
@@ -15,7 +17,7 @@
 <script>
 export default {
   name: 'VideCall',
-  props: ['call', 'userName', 'callTime', 'isFromUser']
+  props: ['call', 'userName', 'callTime', 'isFromUser', 'callDuration']
 }
 </script>
 <style lang="stylus">

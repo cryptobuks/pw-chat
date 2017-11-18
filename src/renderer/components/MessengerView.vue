@@ -1,5 +1,6 @@
 <template>
   <v-layout row id="wrapper">
+    <!-- No chats view start -->
     <v-flex xs8 offset-xs2 class="text-xs-center"
         v-if="(user && user.contacts && user.contacts.length === 0) && (conversations && conversations.length === 0)">
         <h2 class="text-xs-center blue--text">Looks like you are alone here!</h2>
@@ -8,6 +9,9 @@
           <v-btn flat router to="/add-contact">Add new contact</v-btn>
         </div>
     </v-flex>
+    <!-- No chats view over -->
+
+    <!-- Active Chat view start -->
     <v-flex xs8 offset-xs2 v-else-if="(conversation && conversation.id) && (contact && contact.id)">
         <v-card class="card--flex-toolbar chat--container">
           <v-toolbar card color="white" prominent>
@@ -38,12 +42,19 @@
               {{ isContactOnline ? 'Online': 'Offline' }}
             </v-btn>
 
-            <v-btn icon @click.native.stop="callPartner()">
+            <v-btn icon @click.native.stop="callPartner()" :disabled="!isContactOnline">
               <v-icon>videocam</v-icon>
             </v-btn>
-            <v-btn icon>
-              <v-icon>more_vert</v-icon>
-            </v-btn>
+            <!-- <v-menu bottom left>
+              <v-btn icon slot="activator">
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+              <v-list>
+                <v-list-tile @click="deleteConversation(conversation)">
+                  <v-list-tile-title>Delete this Chat</v-list-tile-title>
+                </v-list-tile>
+              </v-list>
+            </v-menu> -->
           </v-toolbar>
           <v-divider></v-divider>
               <messages-list
@@ -62,6 +73,8 @@
           </v-card-actions>
         </v-card>
     </v-flex>
+    <!-- Active Chat view over -->
+    <!-- Empty Chats View start -->
     <v-flex justify-center align-center v-else mt-5>
       <p class="display-3 text-xs-center blue-grey--text">
         Select a chat or go to <router-link to="/contacts">contacts</router-link> and get started.
@@ -70,6 +83,9 @@
         Your chats are secured by WebRTC's end-to-end encryption.
       </p>
     </v-flex>
+    <!-- Empty chats view over -->
+
+    <!-- Video call dialog start -->
     <v-dialog
         v-if="contact && contact.fullName"
         v-model="callDialog"
@@ -108,6 +124,7 @@
           </v-container>
       </v-card>
     </v-dialog>
+    <!-- Video call dialog over -->
   </v-layout>
 </template>
 
@@ -229,26 +246,33 @@ export default {
       }
     },
     async endCall () {
+      const callEnd = new Date()
       this.$store.dispatch('conversations/clearOnCall')
       // close the call
       this.call.close()
 
-      const callEnd = new Date()
       try {
         if (this.callStart === null) {
           console.log('Call was either rejected or an error occurred!')
           return
         }
         const result = await this.saveCallToServer(this.callStart, callEnd)
-        console.log('Call saved successfully!', callEnd, result)
-        // TODO: send this call details to user
+        if (result !== null) {
+          console.log('Call saved successfully!', callEnd, result)
+          // send this call details to user
+          if (this.peerDataConn && this.peerDataConn.open) {
+            this.peerDataConn.send(result)
+          } else {
+            console.log('Peer not open', this.peerDataConn)
+          }
+        }
       } catch (err) {
         console.log('Call not saved!', err)
       } finally {
         if (this.localStream !== null) {
           console.log('closing the media tracks')
           this.localStream.getTracks().forEach((track, i) => {
-            console.log(`track - ${i}`, track)
+            // console.log(`track - ${i}`, track)
             track.stop()
           })
         }
@@ -269,12 +293,13 @@ export default {
       }
       try {
         const result = await this.$store.dispatch('conversations/sendMessage', message)
-        console.log('message send', result)
-        // TODO: send this call details to user
-        return result
+        if (result && result.id) {
+          return result
+        }
+        return null
       } catch (error) {
         console.log('Message not sent!', error)
-        return error
+        return null
       }
     },
     async callPartner () {
@@ -298,7 +323,7 @@ export default {
           console.log('Call not answered in 5 seconds. closing now')
           this.endCall()
         }
-      }, 10000) // change it to 5000
+      }, 5000)
       // call connected
       this.call.on('stream', _remoteStream => {
         if (!callAccepted) {
@@ -331,11 +356,11 @@ export default {
         try {
           const callEnd = new Date()
           const result = await this.saveCallToServer(this.callStart, callEnd)
-          console.log('Call saved successfully!', result)
-          // TODO: send this call details to user
+          // console.log('Call saved successfully!', result)
+
           this.peerDataConn.send(result)
-          console.log('Call successfully ended')
-          console.log(`Call detailes: started at: ${this.callStart}, ended at: ${callEnd}`)
+          // console.log('Call successfully ended')
+          // console.log(`Call detailes: started at: ${this.callStart}, ended at: ${callEnd}`)
         } catch (err) {
           console.log('Call not saved!', err)
         } finally {
@@ -375,6 +400,28 @@ export default {
         this.bindDataConnEvents(peerDataConn)
       }
       return peerDataConn
+    },
+    async deleteConversation (conversation) {
+      const confirmDelete = window.confirm('Are you sure to delete this chat?')
+      if (confirmDelete) {
+        const { id, userId } = conversation
+        const uId = this.user.id
+        let opts = { id }
+        if (uId === userId) {
+          opts.data = { deletedByUser: true }
+        } else {
+          opts.data = { deletedByPartner: true }
+        }
+        try {
+          const res = await this.$store.dispatch('conversations/deleteConversation', opts)
+          console.log('Conversation deleted', res)
+          if (!res) {
+            console.log('Conversation not deleted!')
+          }
+        } catch (error) {
+          console.log('Error at component deleting conversation', error)
+        }
+      }
     }
   }
 }

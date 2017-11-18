@@ -1,6 +1,15 @@
 <template>
   <v-layout row wrap justify-center>
     <v-flex xs10 md8 align-center justify-center text-xs-center>
+          <v-alert
+            :icon="success ? 'check_circle' : 'warning'"
+            :color="success ? 'success' : 'error'"
+            dismissible
+            v-model="showAlert"
+            transition="scale-transition"
+            >
+            {{ message }}
+          </v-alert>
       <v-toolbar color="white">
         <v-btn icon router :to="{name: 'Profile'}">
           <v-icon>arrow_back</v-icon>
@@ -17,7 +26,6 @@
                 :alt="`${user.firstName}'s  Profile picture.`"
                 style="border-radius: 100px"
                 >
-
             <v-btn
               v-if="!changeProfilePic"
               color="primary"
@@ -241,7 +249,10 @@ export default {
       maxFiles: 1,
       maxFilesize: 2, // MB
       headers: { 'Authorization': window.localStorage.getItem('feathers-jwt') }
-    }
+    },
+    success: false,
+    showAlert: false,
+    message: ''
   }),
   methods: {
     complete (result) {
@@ -267,12 +278,22 @@ export default {
       }
 
       console.log('succes all  fine...')
-      const infoUpdate = await userService.patch(this.user.id, this.profile)
-      console.log('info updated', infoUpdate)
-      this.$store.dispatch('auth/userDetailsUpdated', infoUpdate)
-      if (this.changePass === true) {
-        const passUpdate = await passwordChange({email: this.user.email}, this.passwords.oldPassword, this.passwords.password)
-        console.log('Password changed', passUpdate)
+      try {
+        const infoUpdate = await userService.patch(this.user.id, this.profile)
+        console.log('info updated', infoUpdate)
+        this.message = 'Profile updated successfully!'
+        this.success = true
+        this.$store.dispatch('auth/userDetailsUpdated', infoUpdate)
+        if (this.changePass === true) {
+          const passUpdate = await passwordChange({email: this.user.email}, this.passwords.oldPassword, this.passwords.password)
+          console.log('Password changed', passUpdate)
+        }
+      } catch (error) {
+        console.log('error updating profile', error)
+        this.success = false
+        this.message = 'There was some error: ' + error.message
+      } finally {
+        this.showAlert = true
       }
     }
   }

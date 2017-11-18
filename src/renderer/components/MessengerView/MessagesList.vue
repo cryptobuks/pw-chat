@@ -13,6 +13,7 @@
           :isFromUser="isFromUser(message)"
           :userName="getUserName(message)"
           :messageTime="getMessageTime(message.createdAt)"
+          :deleteMessage="deleteMessage"
           v-if="message.type === 'TEXT'">
         </text-message-item>
         <video-call-item
@@ -20,7 +21,9 @@
           :call="message"
           :isFromUser="isFromUser(message)"
           :userName="getUserName(message)"
+          :deleteMessage="deleteMessage"
           :callTime="getMessageTime(message.createdAt)"
+          :callDuration="getCallDuration(message.callEnd, message.callStart)"
           v-else>
         </video-call-item>
     </template>
@@ -33,7 +36,7 @@ import isToday from 'date-fns/is_today'
 import isYesterday from 'date-fns/is_yesterday'
 import format from 'date-fns/format'
 import differenceInSeconds from 'date-fns/difference_in_seconds'
-
+import distanceInWordsStrict from 'date-fns/distance_in_words_strict'
 import TextMessageItem from './TextMessageItem'
 import VideoCallItem from './VideoCallItem'
 
@@ -47,6 +50,9 @@ export default {
     isFromUser (message) {
       const userId = this.user.id
       return (userId === message.userId)
+    },
+    getCallDuration (date1, date2) {
+      return distanceInWordsStrict(date1, date2)
     },
     getUserName (message) {
       if (this.isFromUser(message)) {
@@ -64,6 +70,27 @@ export default {
         return `Yesterday ${format(msgDate, 'h:MM A')}`
       } else {
         return format(msgDate, 'D MMM h:MM A')
+      }
+    },
+    async deleteMessage (message) {
+      let opts = { id: message.id }
+
+      if (this.isFromUser(message)) {
+        opts.data = { deletedBySender: true }
+      } else {
+        opts.data = { deletedByReciever: true }
+      }
+      try {
+        const deleted = await this.$store.dispatch('conversations/deleteMessage', opts)
+        console.log('Deleted', deleted)
+
+        if (deleted) {
+          console.log('Message Deleted')
+        } else {
+          console.log('Message not deleted')
+        }
+      } catch (error) {
+        console.log('deleting message error at component ', error)
       }
     }
   }

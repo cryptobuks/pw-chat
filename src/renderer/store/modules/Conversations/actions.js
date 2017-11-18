@@ -20,7 +20,7 @@ export default {
     dispatch('addOrUpdateList', messagesByOthersConversations)
     return { messagesByMyConversations, messagesByOthersConversations }
   },
-  async sendMessage ({ dispatch, rootState, commit }, message) {
+  async sendMessage ({ commit }, message) {
     try {
       const result = await messageService.create(message)
       if (message.type === 'CALL') {
@@ -34,6 +34,31 @@ export default {
         commit('clearCall')
       }
       return error
+    }
+  },
+  async deleteMessage ({ commit }, opts) {
+    try {
+      const { id, data } = opts
+      const res = await messageService.patch(id, data)
+      console.log('Action -- delete message -- ', res)
+      commit('removeMessageFromConversation', res)
+      return true
+    } catch (error) {
+      console.log('Error at deleting message', error)
+      return false
+    }
+  },
+
+  async deleteConversation ({ commit }, opts) {
+    try {
+      const { id, data } = opts
+      const res = await conversationService.patch(id, data)
+      console.log('conversation deleted', res)
+      commit('removeConversation', res)
+      return true
+    } catch (error) {
+      console.log('Error at deleting message', error)
+      return false
     }
   },
   onCallNow ({ commit }) {
