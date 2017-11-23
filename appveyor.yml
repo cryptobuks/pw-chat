@@ -28,3 +28,16 @@ build_script:
   - yarn build
 
 test: off
+
+# Deploy the Artifact to Github release
+deploy:
+  release: PWChat-v$(appveyor_build_version)
+  provider: GitHub
+  auth_token:
+    secure: 5u0V0hkdoQIXcZ6aT0pBZ7VhVqSBBbrx6NErCtBWAa23H49ydQoBbfeNlWgvp0DQ # your encrypted token from GitHub
+  artifact: build\*.zip            # upload all NuGet packages to release assets
+  draft: false
+  prerelease: false
+  on:
+    branch: master                 # release from master branch only
+    appveyor_repo_tag: true        # deploy on tag push only
