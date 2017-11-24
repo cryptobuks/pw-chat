@@ -31,7 +31,7 @@ test: off
 
 # Deploy the Artifact to Github release
 deploy:
-  release: PWChat-v0.$(appveyor_build_version)
+  release: PWChat-v$(appveyor_build_version)
   provider: GitHub
   auth_token:
     secure: 5u0V0hkdoQIXcZ6aT0pBZ7VhVqSBBbrx6NErCtBWAa23H49ydQoBbfeNlWgvp0DQ # your encrypted token from GitHub
