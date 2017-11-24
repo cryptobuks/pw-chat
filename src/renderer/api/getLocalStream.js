@@ -6,10 +6,7 @@
 function getLocalStream () {
   const constraints = {
     audio: true,
-    video: {
-      width: { min: 800, ideal: 1280, max: 1920 },
-      height: { min: 500, ideal: 720, max: 1080 }
-    }
+    video: true
   }
 
   return navigator.mediaDevices.getUserMedia(constraints)
