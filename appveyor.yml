@@ -4,6 +4,8 @@ branches:
   only:
     - master
 
+skip_non_tags: true
+
 image: Visual Studio 2017
 platform:
   - x64
@@ -35,8 +37,8 @@ deploy:
   provider: GitHub
   auth_token:
     secure: 5u0V0hkdoQIXcZ6aT0pBZ7VhVqSBBbrx6NErCtBWAa23H49ydQoBbfeNlWgvp0DQ # your encrypted token from GitHub
-  artifact: build\*.exe            # upload all NuGet packages to release assets
-  draft: false
+  artifact: build\*.exe            # upload setup.exe to release assets
+  draft: true
   prerelease: false
   on:
     branch: master                 # release from master branch only

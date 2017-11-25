@@ -1,8 +1,8 @@
 {
-  "name": "pwc2",
+  "name": "pw-chat",
   "version": "0.0.1",
   "author": "Hiren Chauhan <hiren.maheshwari366@gmail.com>",
-  "description": "Migration of PWC app to electron builder and new version of template",
+  "description": "Peer-to-Peer Chat with Video Call support",
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -20,7 +20,7 @@
   },
   "build": {
     "productName": "PW Chat",
-    "appId": "org.simulatedgreg.electron-vue",
+    "appId": "org.slightlytrue.pw-chat",
     "directories": {
       "output": "build"
     },
