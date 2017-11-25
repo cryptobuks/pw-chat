@@ -33,13 +33,22 @@ test: off
 
 # Deploy the Artifact to Github release
 deploy:
-  release: PWChat-v$(appveyor_build_version)
+  release: $(appveyor_repo_tag_name)
   provider: GitHub
   auth_token:
     secure: 5u0V0hkdoQIXcZ6aT0pBZ7VhVqSBBbrx6NErCtBWAa23H49ydQoBbfeNlWgvp0DQ # your encrypted token from GitHub
-  artifact: build\*.exe            # upload setup.exe to release assets
+  artifact: App            # upload setup.exe to release assets
   draft: true
   prerelease: false
   on:
     branch: master                 # release from master branch only
     appveyor_repo_tag: true        # deploy on tag push only
+
+
+#---------------------------------#
+#      artifacts configuration    #
+#---------------------------------#
+
+artifacts:
+  - path: build\*.exe    #<----Same name
+    name: App
