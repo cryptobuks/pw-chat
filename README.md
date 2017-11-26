@@ -15,7 +15,7 @@
 - [ ] Handle deletion of conversation and restarting a conversation
 - [ ] Send files
 - [ ] Improve UI and app responsiveness
-- [ ] Run `peer-server` with express server witth connection reliability
+- [ ] Run `peer-server` with express server with connection reliability
 
 #### Build Setup
 
