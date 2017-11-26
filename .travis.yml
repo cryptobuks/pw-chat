@@ -22,7 +22,8 @@ before_install:
 - mkdir -p /tmp/git-lfs && curl -L https://github.com/github/git-lfs/releases/download/v1.2.1/git-lfs-$([
   "$TRAVIS_OS_NAME" == "linux" ] && echo "linux" || echo "darwin")-amd64-1.2.1.tar.gz
   | tar -xz -C /tmp/git-lfs --strip-components 1 && /tmp/git-lfs/git-lfs pull
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick xz-utils; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install --no-install-recommends
+  -y icnsutils graphicsmagick xz-utils; fi
 install:
 - nvm install 8
 - curl -o- -L https://yarnpkg.com/install.sh | bash
@@ -34,3 +35,18 @@ script:
 branches:
   only:
   - master
+deploy:
+  provider: releases
+  skip_cleanup: true
+  draft: true
+  tag_name: $TRAVIS_TAG
+  api_key:
+    secure: MXubox0J25U7NRo4X+DROrAX60KiBk+dmLQO1F9oSDyqLrPlrytg+tZCef+M0V3wnlhSPQNI/NzV8IPcJxhycXHKSqZV4ekleWwWym4nG8b5bginvK4JRuOyazb+zaQp+/TUkzZhUpXpgTSsOfIeZaUpZvQ0NA3Tja6bFCzBG/+tMBigaEBvqOGqknMxZKrpiqvUEUl09Fg/wBIn3FUBl207Tu3nBHL5QLIWURcRV9zp9jPYneCmUXfVgSWVmuCTO/kJOWAHl0UkrCjigTg12eUdX0JOPA/5D1GEtU/IG+l7L3u18yWWN5MI+N7nbjvP/01RtI7kuWWtMVjfME0Ar1fB7adLiGhnzkzC43zarezmNzmZSHDYNw3U4zcFxkUHUmV/C2zz+RCpfL9qW4Yj1evO1xPMftY4xmXe3CEXP/vFm9ALpZv7fqNZixeORXPMJUwjtFZQui+oaTvgez2cAInlSZE+uLHp8BqULDvvnMP7mmjUThdCD+QlQ93YslrSLZf6FbipzTEtE29APy9yPD/Np5FiZnQutaZqvI5nNNT3IWWns97GaWiSkH5zQe9S5ZxwljmUoY5NORT88ID5Zwv/vxLf0rUexsaxvrVmwqu1HQMPPdgMw24MMdAZmKaXdRv5Huq4GV18FGcyjmEYc+cB/tqfcLHcsJPqgUqi85g=
+  file_glob: true
+  file:
+    - "./build/*.AppImage"
+    - "./build/*.zip"
+    - "./build/latest-mac.json"
+  on:
+    repo: slightlytrue/pw-chat
+    tags: true
