@@ -1,10 +1,18 @@
 # PW Chat
-## MCA Final Year Project
+### MCA Final Year Project
 
-[![Build status](https://ci.appveyor.com/api/projects/status/5uqjakx6omw4929n?svg=true)](https://ci.appveyor.com/project/slightlytrue/pw-chat)
-
+[![Build status](https://ci.appveyor.com/api/projects/status/5uqjakx6omw4929n?retina=true)](https://ci.appveyor.com/project/slightlytrue/pw-chat)
 
 > A Peer-to-Peer Chat application with Video Callig support.using PeerJS.
+
+#### Todo List
+- [x] Create a conversation
+- [x] Send a text message 
+- [x] Video Call
+- [x] Delete a text message
+- [ ] Send file
+- [ ] Improve UI and responsiveness
+
 
 #### Build Setup
 
