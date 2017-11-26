@@ -21,6 +21,7 @@
   "build": {
     "productName": "PW Chat",
     "appId": "org.slightlytrue.pw-chat",
+    "copyright": "Copyright @ 2017 Hiren Chauhan",
     "directories": {
       "output": "build"
     },
@@ -49,7 +50,8 @@
       "icon": "build/icons/icon.ico"
     },
     "linux": {
-      "icon": "build/icons"
+      "icon": "build/icons",
+      "category": "AudioVideo;Chat;P2P;Network"
     }
   },
   "dependencies": {
