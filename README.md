@@ -10,6 +10,7 @@
 - [x] Send a text message 
 - [x] Video Call
 - [x] Delete a text message
+- [ ] Handle deletion of conversation and restarting a conversationn
 - [ ] Send file
 - [ ] Improve UI and responsiveness
 
