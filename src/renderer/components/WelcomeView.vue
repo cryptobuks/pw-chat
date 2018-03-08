@@ -36,8 +36,7 @@
         <v-card-text>
           <div class="text-xs-center">
             <span>&copy; 2017 &middot; <strong>PW Chat App</strong> . Project by
-              <strong>Hiren Chauhan</strong> and
-              <strong>Chirag Rajput</strong>
+              <strong>Hiren Chauhan</strong>
             </span>
           </div>
         </v-card-text>
