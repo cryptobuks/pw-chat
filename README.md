@@ -4,6 +4,8 @@
 [![Build status AppVeyor](https://ci.appveyor.com/api/projects/status/5uqjakx6omw4929n?svg=true)](https://ci.appveyor.com/project/slightlytrue/pw-chat)
 ![Build status travis-ci](https://travis-ci.org/slightlytrue/pw-chat.svg?branch=master)
 
+[ ![Codeship Status for hirenchauhan2/pw-chat](https://app.codeship.com/projects/e95a7350-0530-0136-acce-22added7e9e4/status?branch=master)](https://app.codeship.com/projects/280685)
+
 ### MCA Final Year Project
 
 #### Todo List
