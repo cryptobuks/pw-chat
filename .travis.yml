@@ -41,12 +41,12 @@ deploy:
   draft: true
   tag_name: $TRAVIS_TAG
   api_key:
-    secure: MXubox0J25U7NRo4X+DROrAX60KiBk+dmLQO1F9oSDyqLrPlrytg+tZCef+M0V3wnlhSPQNI/NzV8IPcJxhycXHKSqZV4ekleWwWym4nG8b5bginvK4JRuOyazb+zaQp+/TUkzZhUpXpgTSsOfIeZaUpZvQ0NA3Tja6bFCzBG/+tMBigaEBvqOGqknMxZKrpiqvUEUl09Fg/wBIn3FUBl207Tu3nBHL5QLIWURcRV9zp9jPYneCmUXfVgSWVmuCTO/kJOWAHl0UkrCjigTg12eUdX0JOPA/5D1GEtU/IG+l7L3u18yWWN5MI+N7nbjvP/01RtI7kuWWtMVjfME0Ar1fB7adLiGhnzkzC43zarezmNzmZSHDYNw3U4zcFxkUHUmV/C2zz+RCpfL9qW4Yj1evO1xPMftY4xmXe3CEXP/vFm9ALpZv7fqNZixeORXPMJUwjtFZQui+oaTvgez2cAInlSZE+uLHp8BqULDvvnMP7mmjUThdCD+QlQ93YslrSLZf6FbipzTEtE29APy9yPD/Np5FiZnQutaZqvI5nNNT3IWWns97GaWiSkH5zQe9S5ZxwljmUoY5NORT88ID5Zwv/vxLf0rUexsaxvrVmwqu1HQMPPdgMw24MMdAZmKaXdRv5Huq4GV18FGcyjmEYc+cB/tqfcLHcsJPqgUqi85g=
+    secure: qm3QPvQb4GyQku25zbFzAdXrHyJpJdn5bdfVUWib3YT8wuRERJgHPu2WaFeVqHx8JolQT33BFwy1N12Hg6MTy7T5WE/byM0Yitzj1r/M7Pz8qij/vYQuxnNLaQSWAf+ff2pBrJ7Ebj/92RUSC3EObtofapQrhVOSW3NFSw/Go3E9USPECLet4THj+w5ln92jbZOkD6THCbErasGczS3iWZ+1zeHpCbQV9p9GIdytcU7knS8/+PcROLre40eHepbInl9z+ChP7Imm637NX3CkB83l2KrqoN7JRVV/QgfOaSjcDaBQ3MdbwflN3w33hIpIsu0p/Df5gweD8CzDi8FU00doSold2xNsXBLvtHY709N2EtAIwXrfE9l7BMml+e6iPfjdPaPmA06t54udqInXdU+AI80cpWSKOXgEcfTKtChdBD0dVfW8eC0boVb5VnJHE0I4b8OMi2yqanznRbh1TUgU2D+u9FxYepWaocUMeliH4uVV3WlbC93XRMvobkexTB1rdo11VP8bzqATmtmgeXsL6uuc3vF4+ksx1EG6Ijb/+/RDG80wN5v82glMQB4LQF2dwKuZ3JD+eamGaEAkboAPznOEq9SY9PiLqzMoEe4+vFeeDLSofUvJZMCrZJKbG/+zWgEU/dtaEe53P23HGfaF/VQQSs0k5+uZ2DrD0Ik=
   file_glob: true
   file:
     - "./build/*.AppImage"
     - "./build/*.zip"
     - "./build/latest-mac.json"
   on:
-    repo: slightlytrue/pw-chat
+    repo: hirenchauhan2/pw-chat
     tags: true
