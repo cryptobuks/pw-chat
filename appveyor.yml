@@ -1,4 +1,4 @@
-version: 0.1.{build}
+version: {APPVEYOR_REPO_TAG_NAME}
 
 branches:
   only:
@@ -36,7 +36,7 @@ deploy:
   release: PWChat-v$(appveyor_build_version)
   provider: GitHub
   auth_token:
-    secure: 5u0V0hkdoQIXcZ6aT0pBZ7VhVqSBBbrx6NErCtBWAa23H49ydQoBbfeNlWgvp0DQ # your encrypted token from GitHub
+    secure: yVwqCoppXFphHs4fzjzpe6D7Sot2GZ3Hn7DAvM7cjDClnHseC9h+4OcJdyh2TM9O # your encrypted token from GitHub
   artifact: App            # upload setup.exe to release assets
   draft: true
   prerelease: false
